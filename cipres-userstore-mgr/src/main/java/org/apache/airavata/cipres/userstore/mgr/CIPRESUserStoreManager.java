@@ -84,11 +84,10 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
 
             prepStmt = dbConnection.prepareStatement(sqlstmt);
             prepStmt.setString(1, userName);
-
             rs = prepStmt.executeQuery();
 
             if (rs.next()) {
-                String storedPassword = rs.getString(2);
+                String storedPassword = rs.getString(12);
                 String hash = getMD5HexString(password);
                 if ((storedPassword != null) && (storedPassword.trim().equals(hash))) {
                     isAuthed = true;
