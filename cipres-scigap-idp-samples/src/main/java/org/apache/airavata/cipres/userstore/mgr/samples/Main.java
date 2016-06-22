@@ -42,6 +42,9 @@ public class Main {
 
         OAuthTokenVerificationSample tokenVerifier = new OAuthTokenVerificationSample();
         System.out.println("Verifying OAuth Access Token");
+
+        //This validation response can be cached (i.e access_token, username pairs) so that next time the token can be
+        //locally verified without invoking the remote SciGaP IDP to reduce overhead.
         OAuth2TokenValidationResponseDTO validationResp = tokenVerifier.validateAccessToken(authResponse.getAccess_token());
 
         //Validated username is in the CIPRES.ORG/<username>@prod.cipres format
