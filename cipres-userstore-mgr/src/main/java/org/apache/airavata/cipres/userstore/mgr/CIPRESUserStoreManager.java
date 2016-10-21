@@ -39,11 +39,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CIPRESUserStoreManager extends JDBCUserStoreManager {
     private static Log log = LogFactory.getLog(CIPRESUserStoreManager.class);
+
+    private static String GET_PROPS_FOR_PROFILE_SQL = "SELECT EMAIL,FIRST_NAME,LAST_NAME FROM USERS WHERE USER_ID=?";
 
     public CIPRESUserStoreManager() {
     }
@@ -106,6 +110,82 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
 
         return isAuthed;
 
+    }
+
+    @Override
+    protected String getProperty(Connection dbConnection, String userName, String propertyName,
+                                 String profileName) throws UserStoreException {
+        String sqlStmt = GET_PROPS_FOR_PROFILE_SQL;
+        if (sqlStmt == null) {
+            throw new UserStoreException("The sql statement for add user property sql is null");
+        }
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        String value = null;
+        try {
+            prepStmt = dbConnection.prepareStatement(sqlStmt);
+            prepStmt.setString(1, userName);
+
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                if(propertyName.equals("EMAIL")){
+                    value = rs.getString(1);
+                }else if(propertyName.equals("FIRST_NAME")){
+                    value = rs.getString(2);
+                }else if(propertyName.equals("LAST_NAME")){
+                    value = rs.getString(3);
+                }
+            }
+            return value;
+        } catch (SQLException e) {
+            log.error("Using sql : " + sqlStmt);
+            throw new UserStoreException(e.getMessage(), e);
+        } finally {
+            DatabaseUtil.closeAllConnections(null, rs, prepStmt);
+        }
+    }
+
+    @Override
+    public Map<String, String> getUserPropertyValues(String userName, String[] propertyNames,
+                                                     String profileName) throws UserStoreException {
+        Connection dbConnection = null;
+        String sqlStmt = null;
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        String[] propertyNamesSorted = propertyNames.clone();
+        Arrays.sort(propertyNamesSorted);
+        Map<String, String> map = new HashMap<String, String>();
+        try {
+            dbConnection = getDBConnection();
+            sqlStmt = GET_PROPS_FOR_PROFILE_SQL;
+            prepStmt = dbConnection.prepareStatement(sqlStmt);
+            prepStmt.setString(1, userName);
+
+            rs = prepStmt.executeQuery();
+            while (rs.next()) {
+                String email = rs.getString(1);
+                String age = rs.getString(2);
+                String status = rs.getString(3);
+                if (Arrays.binarySearch(propertyNamesSorted, "EMAIL") >= 0) {
+                    map.put("EMAIL", email);
+                }
+
+                if(Arrays.binarySearch(propertyNamesSorted, "FIRST_NAME") >= 0){
+                    map.put("FIRST_NAME", age);
+                }
+
+                if(Arrays.binarySearch(propertyNamesSorted, "LAST_NAME") >= 0){
+                    map.put("LAST_NAME", status);
+                }
+
+            }
+
+            return map;
+        } catch (SQLException e) {
+            throw new UserStoreException(e.getMessage(), e);
+        } finally {
+            DatabaseUtil.closeAllConnections(dbConnection, rs, prepStmt);
+        }
     }
 
 

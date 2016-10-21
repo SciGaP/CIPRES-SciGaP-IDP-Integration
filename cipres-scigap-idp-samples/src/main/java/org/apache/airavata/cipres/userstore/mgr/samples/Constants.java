@@ -23,8 +23,8 @@ package org.apache.airavata.cipres.userstore.mgr.samples;
 public class Constants {
     public static final String IDP_TENANT_ID = "prod.cipres";
     public static final String IDP_URL = "https://idp.scigap.org:9443";
-    public static final String IDP_CLIENT_KEY = "";
-    public static final String IDP_CLIENT_SECRET = "";
-    public static final String IDP_CIPRES_ADMIN_USERNAME = "";
-    public static final String IDP_CIPRES_ADMIN_PASSWORD = "";
+    public static final String IDP_CLIENT_KEY = "3vUnuFcGyQCG3558WNjAXPfntkEa";
+    public static final String IDP_CLIENT_SECRET = "uvuEZ5YR_WKUrbUb31rQAu4FjvUa";
+    public static final String IDP_CIPRES_ADMIN_USERNAME = "admin";
+    public static final String IDP_CIPRES_ADMIN_PASSWORD = "cipres_scigap_2349";
 }

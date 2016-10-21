@@ -26,8 +26,8 @@ import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2TokenValidationResponseDTO
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        String username = "";
-        String password = "";
+        String username = "scnakandala";
+        String password = "nimbus2000";
 
         OAuthTokenRetrievalSample tokenRetriever = new OAuthTokenRetrievalSample();
         System.out.println("Getting OAuth Access Token for User : " + username);
