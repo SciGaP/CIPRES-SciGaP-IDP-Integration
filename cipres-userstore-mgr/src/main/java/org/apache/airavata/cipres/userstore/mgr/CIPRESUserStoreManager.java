@@ -47,8 +47,6 @@ import java.util.Map;
 public class CIPRESUserStoreManager extends JDBCUserStoreManager {
     private static Log log = LogFactory.getLog(CIPRESUserStoreManager.class);
 
-    private static String GET_PROPS_FOR_PROFILE_SQL = "SELECT EMAIL,FIRST_NAME,LAST_NAME FROM USERS WHERE USER_ID=?";
-
     public CIPRESUserStoreManager() {
     }
 
@@ -63,7 +61,6 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
 
     @Override
     public boolean doAuthenticate(String userName, Object credential) throws UserStoreException {
-
         if (CarbonConstants.REGISTRY_ANONNYMOUS_USERNAME.equals(userName)) {
             log.error("Anonymous user trying to login");
             return false;
@@ -109,13 +106,12 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         }
 
         return isAuthed;
-
     }
 
     @Override
     protected String getProperty(Connection dbConnection, String userName, String propertyName,
                                  String profileName) throws UserStoreException {
-        String sqlStmt = GET_PROPS_FOR_PROFILE_SQL;
+        String sqlStmt = realmConfig.getUserStoreProperty(JDBCRealmConstants.GET_PROPS_FOR_PROFILE);
         if (sqlStmt == null) {
             throw new UserStoreException("The sql statement for add user property sql is null");
         }
@@ -125,7 +121,6 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         try {
             prepStmt = dbConnection.prepareStatement(sqlStmt);
             prepStmt.setString(1, userName);
-
             rs = prepStmt.executeQuery();
             while (rs.next()) {
                 if(propertyName.equals("EMAIL")){
@@ -157,10 +152,9 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         Map<String, String> map = new HashMap<String, String>();
         try {
             dbConnection = getDBConnection();
-            sqlStmt = GET_PROPS_FOR_PROFILE_SQL;
+            sqlStmt = realmConfig.getUserStoreProperty(JDBCRealmConstants.GET_PROPS_FOR_PROFILE);
             prepStmt = dbConnection.prepareStatement(sqlStmt);
             prepStmt.setString(1, userName);
-
             rs = prepStmt.executeQuery();
             while (rs.next()) {
                 String email = rs.getString(1);
@@ -186,6 +180,11 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         } finally {
             DatabaseUtil.closeAllConnections(dbConnection, rs, prepStmt);
         }
+    }
+
+    @Override
+    public String[] getProfileNames(String userName) throws UserStoreException {
+        return new String[]{"default"};
     }
 
 
@@ -256,19 +255,6 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         return new String[0];
     }
 
-
-    /*@Override
-    public Map<String, String> doGetUserClaimValues(String userName, String[] claims,
-                                                    String domainName) throws UserStoreException {
-        return new HashMap<String, String>();
-    }*/
-
-    /*@Override
-    public String doGetUserClaimValue(String userName, String claim, String profileName)
-            throws UserStoreException {
-        return null;
-    }*/
-
     @Override
     public boolean isReadOnly() throws UserStoreException {
         return true;
@@ -281,6 +267,7 @@ public class CIPRESUserStoreManager extends JDBCUserStoreManager {
         throw new UserStoreException(
                 "User store is operating in read only mode. Cannot write into the user store.");
     }
+
 
     public void doAddRole(String roleName, String[] userList, org.wso2.carbon.user.api.Permission[] permissions)
             throws UserStoreException {

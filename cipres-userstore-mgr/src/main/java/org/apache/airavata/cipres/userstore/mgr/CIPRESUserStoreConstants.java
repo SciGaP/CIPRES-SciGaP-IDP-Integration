@@ -50,7 +50,8 @@ public class CIPRESUserStoreConstants {
 
         //Advanced Properties (No descriptions added for each property)
         setAdvancedProperty("SelectUserSQL","Select User SQL", "SELECT * FROM users WHERE USERNAME=?", "");
-        setAdvancedProperty("UserFilterSQL","User Filter SQL", "SELECT USERNAME FROM users WHERE USERNAME LIKE ?  ORDER BY USER_ID", "");
+        setAdvancedProperty("UserFilterSQL","User Filter SQL", "SELECT USERNAME FROM users WHERE USERNAME LIKE ?  ORDER BY USERNAME", "");
+        setAdvancedProperty("GetUserPropertiesForProfileSQL", "User Profile Select SQL", "SELECT EMAIL, FIRST_NAME, LAST_NAME FROM users WHERE USERNAME=?", "");
 
     }
 
